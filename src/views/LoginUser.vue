@@ -1,56 +1,77 @@
 <template>
-  <v-app>
-    <v-main>
-      <v-container>
-        <v-form ref="form" v-model="valid" lazy-validation>
-          <v-text-field
-            v-model="username"
-            :rules="nameRules"
-            label="Username"
-            required
-          ></v-text-field>
+  <v-snackbar v-model="showSnackbar" color="error" :timeout="3000" auto-height multi-line>
+    {{ $state.errorMessage }}
+  </v-snackbar>
+  <v-container>
+    <v-row justify="center">
+      <v-col cols="12" sm="8" md="6">
+        <v-card>
+          <v-card-title class="headline">Connexion</v-card-title>
+          <v-card-text>
+            <v-form ref="form" v-model="valid">
 
-          <v-text-field
-            v-model="password"
-            :rules="passwordRules"
-            label="Password"
-            type="password"
-            required
-          ></v-text-field>
+              <v-text-field
+                  v-model="name"
+                  :rules="nameRules"
+                  label="Nom d'utilisateur"
+              ></v-text-field>
 
-          <v-btn :disabled="!valid" color="success" class="mr-4" @click="validate()">
-            Login
-          </v-btn>
-        </v-form>
-      </v-container>
-    </v-main>
-  </v-app>
+              <v-text-field
+                  v-model="password"
+                  :rules="passwordRules"
+                  label="Mot de passe"
+                  type="password"
+              ></v-text-field>
+
+              <v-btn type="submit" color="primary" :disabled="!valid"
+                     @click.prevent="login({nom: this.name, password: this.password})">Se connecter</v-btn>
+            </v-form>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
-import { ref } from "vue";
-
+import { useUsersStore } from '@/store/UserStore';
+import { ref, watch } from 'vue';
 export default {
   setup() {
-    const valid = ref(true);
-    const username = ref("");
-    const password = ref("");
-    const nameRules = [
-      v => !!v || 'Name is required',
-      v => (v && v.length <= 10) || 'Name must be less than 10 characters',
-    ];
-    const passwordRules = [
-      v => !!v || 'Password is required',
-      v => (v && v.length >= 8) || 'Password must be at least 8 characters',
-    ];
+    const { login, $state } = useUsersStore();
 
-    const validate = () => {
-      if (this.$refs.form.validate()) {
-        // do something
+    const showSnackbar = ref(false);
+
+    watch(() => $state.errorMessage, (value) => {
+      showSnackbar.value = value !== false;
+      if(showSnackbar.value == false){
+        $state.errorMessage = showSnackbar.value;
       }
-    };
+    });
 
-    return { valid, username, password, nameRules, passwordRules, validate };
+    const closeSnackbar = () => {
+      showSnackbar.value = false;
+      $state.errorMessage = false;
+    }
+
+    return { login, showSnackbar, $state, closeSnackbar };
   },
-};
+  data() {
+    return {
+      valid: false,
+      name: '',
+      password: '',
+      nameRules: [
+        v => !!v || 'Nom d\'utilisateur est nécessaire',
+      ],
+      passwordRules: [
+        v => !!v || 'Mot de passe est nécessaire',
+      ]
+    }
+  }
+}
 </script>
+
+<style scoped>
+/* Ajoutez des styles spécifiques au composant ici si nécessaire */
+</style>
