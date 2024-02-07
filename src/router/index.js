@@ -1,10 +1,8 @@
-
 import { createRouter, createWebHistory } from 'vue-router'
-import AutoRoutes from './autoRoutes'
+import autoRoutes from './autoRoutes'
 
 const routes = [
-
-  ...AutoRoutes
+  ...autoRoutes
 ]
 
 const router = createRouter({

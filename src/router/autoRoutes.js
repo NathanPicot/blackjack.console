@@ -1,18 +1,19 @@
-// src/router/autoRoutes.js
 const routes = []
 
 function importAll(r) {
     r.keys().forEach(key => {
-        console.log("key =>", key)
+        const componentConfig = r(key);
         const componentName = key.replace('./', '').replace('.vue', '')
         routes.push({
             path: `/${componentName.toLowerCase()}`,
             name: componentName,
-            component: () => import(`@/views/${componentName}.vue`)
-        })
-    })
+            component: componentConfig.default || componentConfig,
+            meta: componentConfig.default.meta || {}
+        });
+    });
 }
 
 importAll(require.context('@/views/', false, /\.vue$/))
 
-export default routes
+
+export default routes;

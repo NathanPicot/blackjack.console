@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Configurations globales d'Axios
 axios.defaults.baseURL = 'http://localhost:5039/api';
-
-//axios.defaults.headers.common['Authorization'] = 'Bearer your-access-token';
+let token = localStorage.getItem('authToken');
+axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
 export default axios;

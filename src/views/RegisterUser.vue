@@ -10,7 +10,7 @@
         <v-card>
           <v-card-title class="headline">Inscription</v-card-title>
           <v-card-text>
-            <v-form ref="form"  v-model="valid">
+            <v-form ref="form" v-model="valid">
 
               <v-text-field
                   v-model="name"
@@ -32,7 +32,9 @@
                   type="password"
               ></v-text-field>
 
-              <v-btn type="submit" color="primary" :disabled="!valid" @click.prevent="addUser({nom:this.name, password:this.password})">S'inscrire</v-btn>
+              <v-btn type="submit" color="primary" :disabled="!valid"
+                     @click.prevent="addUser({nom:this.name, password:this.password})">S'inscrire
+              </v-btn>
             </v-form>
           </v-card-text>
         </v-card>
@@ -43,18 +45,19 @@
 </template>
 
 <script>
-import { useUsersStore } from '@/store/UserStore';
-import { ref, watch } from 'vue';
+import {useUsersStore} from '@/store/UserStore';
+import {ref, watch} from 'vue';
+
 export default {
   setup() {
-    const { addUser, $state } = useUsersStore();
+    const {addUser, $state} = useUsersStore();
 
     const showSnackbar = ref(false);
 
     // Regardez la valeur errorMessage et modifiez la valeur de showSnackbar en conséquence
     watch(() => $state.errorMessage, (value) => {
       showSnackbar.value = value !== false;
-      if(showSnackbar.value == false){
+      if (showSnackbar.value == false) {
         $state.errorMessage = showSnackbar.value;
       }
     });
@@ -64,12 +67,13 @@ export default {
       $state.errorMessage = false;
     }
 
-    return { addUser, showSnackbar, $state, closeSnackbar };
+
+    return {addUser, showSnackbar, $state, closeSnackbar};
   },
   data() {
     return {
       valid: false,
-      user:{},
+      user: {},
       name: '',
       password: '',
       confirmPassword: '',
@@ -89,9 +93,7 @@ export default {
     ]
   },
 
-  methods: {
-
-  }
+  methods: {}
 }
 </script>
 

@@ -9,7 +9,9 @@ import { createPinia } from 'pinia'
 loadFonts()
 
 const pinia = createPinia()
-createApp(App).use(createPinia()).use(router)
+createApp(App)
+  .use(createPinia())
+  .use(router)
   .use(vuetify)
   .use(pinia)
   .mount('#app')

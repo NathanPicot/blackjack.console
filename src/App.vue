@@ -3,7 +3,7 @@
     <v-navigation-drawer v-model="drawer" app>
       <v-list>
         <v-list-item-group>
-          <v-list-item v-for="(route, index) in autoRoutes" :key="index" @click="navigateTo(route.path)">
+          <v-list-item v-for="(route, index) in filteredRoutes" :key="index" @click="navigateTo(route.path)">
             <v-list-item-content>{{ route.name }}</v-list-item-content>
           </v-list-item>
         </v-list-item-group>
@@ -21,8 +21,19 @@
 
 <script setup>
 import autoRoutes from './router/autoRoutes';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import {useUsersStore} from "@/store/UserStore";
+
+const filteredRoutes = computed(() => {
+  if (!localStorage.getItem('authToken')) {
+    console.log("ICI")
+    return autoRoutes.filter(route => !route.meta.requiresAuth);
+  }
+  console.log("token => ", localStorage.getItem('authToken'))
+  useUsersStore().loginByToken(localStorage.getItem('authToken'))
+  return autoRoutes.filter(route => route.meta.requiresAuth);
+});
 
 const router = useRouter();
 const drawer = ref(true);

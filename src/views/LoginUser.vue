@@ -24,7 +24,8 @@
               ></v-text-field>
 
               <v-btn type="submit" color="primary" :disabled="!valid"
-                     @click.prevent="login({nom: this.name, password: this.password})">Se connecter</v-btn>
+                     @click.prevent="loginUser({nom: this.name, password: this.password})">Se connecter
+              </v-btn>
             </v-form>
           </v-card-text>
         </v-card>
@@ -34,17 +35,18 @@
 </template>
 
 <script>
-import { useUsersStore } from '@/store/UserStore';
-import { ref, watch } from 'vue';
+import {useUsersStore} from '@/store/UserStore';
+import {ref, watch} from 'vue';
+
 export default {
   setup() {
-    const { login, $state } = useUsersStore();
+    const {loginUser, $state} = useUsersStore();
 
     const showSnackbar = ref(false);
 
     watch(() => $state.errorMessage, (value) => {
       showSnackbar.value = value !== false;
-      if(showSnackbar.value == false){
+      if (showSnackbar.value == false) {
         $state.errorMessage = showSnackbar.value;
       }
     });
@@ -54,7 +56,7 @@ export default {
       $state.errorMessage = false;
     }
 
-    return { login, showSnackbar, $state, closeSnackbar };
+    return {loginUser, showSnackbar, $state, closeSnackbar};
   },
   data() {
     return {
