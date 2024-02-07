@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="showWinDialog" max-width="500">
+  <v-dialog v-model="showWinDialog" max-width="500" persistent>
     <v-card>
       <v-card-title class="headline">Félicitations, vous avez gagné !</v-card-title>
       <v-card-text>Votre gain est de {{ potentialGain }}.</v-card-text>
@@ -9,7 +9,7 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
-  <v-dialog v-model="showLoseDialog" max-width="500">
+  <v-dialog v-model="showLoseDialog" max-width="500" persistent>
     <v-card>
       <v-card-title class="headline">Dommage, vous avez perdu !</v-card-title>
       <v-card-actions>
@@ -19,7 +19,7 @@
     </v-card>
   </v-dialog>
 
-  <v-dialog v-model="showDrawDialog" max-width="500">
+  <v-dialog v-model="showDrawDialog" max-width="500" persistent>
     <v-card>
       <v-card-title class="headline">Match nul !</v-card-title>
       <v-card-actions>
@@ -32,6 +32,7 @@
     <v-row>
       <v-col>
         <h1>Jeu de Blackjack </h1>
+        <h2>Argent disponible : {{ money }}</h2>
         <v-btn v-if="!isGameStarted" @click="openDialog">Commencer un nouveau jeu</v-btn>
         <v-dialog v-model="dialog">
           <v-card>
@@ -95,7 +96,7 @@
 </template>
 
 <script>
-import {ref, computed} from 'vue';
+import {computed, ref, watchEffect} from 'vue';
 import {usePartieStore} from "@/store/PartieStore";
 import {useUsersStore} from "@/store/UserStore";
 import {useCarteStore} from "@/store/CarteStore";
@@ -111,21 +112,25 @@ export default {
     const showWinDialog = ref(false);
     const showLoseDialog = ref(false);
     const showDrawDialog = ref(false);
+    let money = ref(null);
     const closeWinDialog = () => {
       showWinDialog.value = false;
       // reset stores after closing win dialog
       carteStore.clearData();
+      isStand.value = false;
       // Add code to reset other stores if needed
     };
     const closeLoseDialog = () => {
       showLoseDialog.value = false;
       // reset stores after closing lose dialog
       carteStore.clearData();
+      isStand.value = false;
     };
     const closeDrawDialog = () => {
       showDrawDialog.value = false;
       // reset stores after closing draw dialog
       carteStore.clearData();
+      isStand.value = false;
     };
 
     const isGameStarted = computed(() => {
@@ -136,8 +141,12 @@ export default {
     const main = computed(() => carteStore.getMain);
     const dealerMains = computed(() => carteStore.getDealerMain)
     const points = computed(() => {
-      const handWithFlexibleAces = main.value.map(card => ({ ...card, valeur: card.valeur === 1 && totalPoints + 10 <= 21 ? 11 : card.valeur }));
-      const totalPoints = handWithFlexibleAces.reduce((total, card) => total + card.valeur, 0);
+      let totalPoints = main.value.reduce((total, card) => total + (card.valeur >= 10 ? 10 : card.valeur), 0);
+      const acesCount = main.value.filter(card => card.valeur === 1).length;
+
+      if (acesCount > 0 && totalPoints + 10 <= 21) totalPoints += 10;
+
+      if (totalPoints > 21) totalPoints -= 10 * acesCount;
       if (totalPoints >= 21) {
         announceResult();
       }
@@ -145,11 +154,14 @@ export default {
     });
 
     const dealerPoints = computed(() => {
-      const totalPoints = dealerMains.value.reduce((total, card) => total + card.valeur, 0);
-      // Lorsque les points atteignent ou dépassent 21, annoncer le résultat
+      let totalPoints = dealerMains.value.reduce((total, card) => total + (card.valeur >= 10 ? 10 : card.valeur), 0);
+      const acesCount = dealerMains.value.filter(card => card.valeur === 1).length;
+
+      if (acesCount > 0 && totalPoints + 10 <= 21) totalPoints += 10;
+
+      if (totalPoints > 21) totalPoints -= 10 * acesCount;
       return totalPoints;
     });
-
     const isGameOver = computed(() => points.value >= 21);
 
     const hit = () => {
@@ -241,7 +253,6 @@ export default {
         Mise: bet.value,
         ID_joueur: iD_Joueur,
       };
-      console.log('PartieData', partieData)
       var joueur = userStore.user;
       if (result == 'win') {
 
@@ -263,7 +274,9 @@ export default {
       setTimeout(() => (showNotification.value = false), 3000); // Ferme la notification après 3 secondes
     };
 
-
+    watchEffect(async () => {
+      money.value = await userStore.getUserMoney;
+    });
     return {
       bet,
       dialog,
@@ -280,7 +293,8 @@ export default {
       closeLoseDialog,
       closeDrawDialog,
       notificationMessage, stand, isStand, dealerMains, dealerPoints, showWinDialog,
-      closeWinDialog
+      closeWinDialog,
+      money
     };
   },
 };

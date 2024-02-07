@@ -20,7 +20,6 @@ export const usePartieStore = defineStore('partie', {
       axios.post('/Partie/add', partie, {headers: {'Content-Type': 'application/json'}})
         .then(response => {
           if (response.data.success) {
-            console.log(response.data.success);
             this.$state.errorMessage = false;
             this.$state.partie = response.data.partie
           } else if (response.data.error) {
@@ -42,7 +41,6 @@ export const usePartieStore = defineStore('partie', {
     },
 
     endPartie(partie) {
-      console.log("PArtie =>", partie)
       this.$state.errorMessage = false;
       axios.post('/Partie/endPartie', partie, {headers: {'Content-Type': 'application/json'}})
         .catch(error => {

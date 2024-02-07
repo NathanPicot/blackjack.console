@@ -19,7 +19,6 @@ export const useCarteStore = defineStore('carte', {
       axios.get('/Carte/getAll')
         .then(response => {
           if (response.data.success) {
-            console.log(response.data.success);
             this.$state.errorMessage = false;
             this.$state.cartes = response.data.cartes
           } else if (response.data.error) {
@@ -46,8 +45,6 @@ export const useCarteStore = defineStore('carte', {
       axios.post('/Carte/Hit', cartes, {headers: {'Content-Type': 'application/json'}})
         .then(response => {
           if (response.data.success) {
-            console.log("responseCartes =>", response.data)
-            console.log(response.data.success);
             this.$state.errorMessage = false;
             this.$state.cartes = response.data.cartes
             this.$state.cartesMain.push(response.data.carte)
@@ -75,8 +72,6 @@ export const useCarteStore = defineStore('carte', {
       axios.post('/Carte/Hit', cartes, {headers: {'Content-Type': 'application/json'}})
         .then(response => {
           if (response.data.success) {
-            console.log("responseCartes =>", response.data)
-            console.log(response.data.success);
             this.$state.errorMessage = false;
             this.$state.cartes = response.data.cartes
             this.$state.cartesDealers.push(response.data.carte)

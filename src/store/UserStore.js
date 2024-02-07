@@ -17,7 +17,6 @@ export const useUsersStore = defineStore('users', {
       axios.post('/Joueur/add', user, {headers: {'Content-Type': 'application/json'}})
         .then(response => {
           if (response.data.success) {
-            console.log(response.data.success);
             this.$state.errorMessage = false;
           } else if (response.data.error) {
 
@@ -44,7 +43,6 @@ export const useUsersStore = defineStore('users', {
         .then(response => {
           if (response.data.success) {
             // Stocke le token dans le localStorage
-            console.log("Response =>", response);
             localStorage.setItem('authToken', response.data.token);
 
             this.$state.errorMessage = false;
@@ -96,7 +94,6 @@ export const useUsersStore = defineStore('users', {
       axios.post('/Joueur/UpdateMoney', user, {headers: {'Content-Type': 'application/json'}})
         .then(response => {
           if (response.data.success) {
-            console.log(response.data.success);
             this.$state.errorMessage = false;
           } else if (response.data.error) {
 
