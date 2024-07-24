@@ -102,6 +102,9 @@ import {useUsersStore} from "@/store/UserStore";
 import {useCarteStore} from "@/store/CarteStore";
 
 export default {
+  meta: {
+    requiresAuth: true
+  },
   setup() {
     const userStore = useUsersStore();
     const carteStore = useCarteStore();
@@ -144,9 +147,9 @@ export default {
       let totalPoints = main.value.reduce((total, card) => total + (card.valeur >= 10 ? 10 : card.valeur), 0);
       const acesCount = main.value.filter(card => card.valeur === 1).length;
 
-      if (acesCount > 0 && totalPoints + 10 <= 21) totalPoints += 10;
-
+      if (totalPoints < 21) totalPoints += 10 * acesCount;
       if (totalPoints > 21) totalPoints -= 10 * acesCount;
+
       if (totalPoints >= 21) {
         announceResult();
       }
@@ -157,8 +160,8 @@ export default {
       let totalPoints = dealerMains.value.reduce((total, card) => total + (card.valeur >= 10 ? 10 : card.valeur), 0);
       const acesCount = dealerMains.value.filter(card => card.valeur === 1).length;
 
-      if (acesCount > 0 && totalPoints + 10 <= 21) totalPoints += 10;
 
+      if (totalPoints < 21) totalPoints += 10 * acesCount;
       if (totalPoints > 21) totalPoints -= 10 * acesCount;
       return totalPoints;
     });

@@ -38,6 +38,7 @@
 import {useUsersStore} from '@/store/UserStore';
 import {ref, watch} from 'vue';
 
+
 export default {
   setup() {
     const {loginUser, $state} = useUsersStore();
@@ -46,8 +47,14 @@ export default {
 
     watch(() => $state.errorMessage, (value) => {
       showSnackbar.value = value !== false;
-      if (showSnackbar.value == false) {
+      if (showSnackbar.value === false) {
         $state.errorMessage = showSnackbar.value;
+      }
+    });
+
+    watch( ()=> $state.succes, (value)  => {
+      if(value == true){
+        window.location.href = '/acceuilsite';
       }
     });
 

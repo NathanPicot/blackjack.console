@@ -10,14 +10,17 @@ export const useUsersStore = defineStore('users', {
     user: null,
     // Add an errorMessage property to the state
     errorMessage: false,
+    succes: false,
   }),
   actions: {
     addUser(user) {
       this.$state.errorMessage = false;
+      this.$state.succes = false;
       axios.post('/Joueur/add', user, {headers: {'Content-Type': 'application/json'}})
         .then(response => {
           if (response.data.success) {
             this.$state.errorMessage = false;
+            this.$state.succes = true;
           } else if (response.data.error) {
 
             // Update the errorMessage property on error
@@ -38,7 +41,7 @@ export const useUsersStore = defineStore('users', {
 
     loginUser(user) {
       this.$state.errorMessage = false;
-
+      this.$state.succes = false;
       axios.post('/Joueur/login', user, {headers: {'Content-Type': 'application/json'}})
         .then(response => {
           if (response.data.success) {
@@ -46,6 +49,7 @@ export const useUsersStore = defineStore('users', {
             localStorage.setItem('authToken', response.data.token);
 
             this.$state.errorMessage = false;
+            this.$state.succes = true;
             this.$state.user = response.data.user;
           } else if (response.data.error) {
             this.$state.errorMessage = response.data.error;
@@ -63,6 +67,7 @@ export const useUsersStore = defineStore('users', {
     },
 
     loginByToken(token) {
+      this.$state.errorMessage = false;
       axios.post(`/Joueur/getByToken?token=${token}`, {token: token}, /*{headers: {'Content-Type': 'application/json'}}*/)
         .then(response => {
           if (response.data.success) {
@@ -91,10 +96,12 @@ export const useUsersStore = defineStore('users', {
 
     UpdateMoney(user) {
       this.$state.errorMessage = false;
+      this.$state.succes = false;
       axios.post('/Joueur/UpdateMoney', user, {headers: {'Content-Type': 'application/json'}})
         .then(response => {
           if (response.data.success) {
             this.$state.errorMessage = false;
+            this.$state.succes = true;
           } else if (response.data.error) {
 
             // Update the errorMessage property on error
