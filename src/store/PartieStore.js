@@ -7,11 +7,11 @@ import axios from '@/axios';
 export const usePartieStore = defineStore('partie', {
   id: 'partie',
   state: () => ({
-    parties: [],
+    gainPerDayList: [],
     partie: null,
     allGain: 0,
     allMise: 0,
-    // Add an errorMessage property to the state
+    partieNumber: 0,
     errorMessage: false,
   }),
   actions: {
@@ -114,16 +114,16 @@ export const usePartieStore = defineStore('partie', {
           });
     },
 
-     fetchAllParties() {
+    fetchGainPerDayList() {
        this.$state.errorMessage = false;
 
-       axios.get('/Partie/getAllPartie')
+       axios.get('/Partie/getGainPerDayList')
            .then(response => {
              if (response.status === 200) {
                this.$state.errorMessage = false;
                console.log("response", response)
 
-               this.$state.parties = response.data
+               this.$state.gainPerDayList = response.data
              } else if (response.data.error) {
 
                // Update the errorMessage property on error
@@ -142,18 +142,33 @@ export const usePartieStore = defineStore('partie', {
            });
     },
 
-  },
-  getters: {
+    fetchPartieNumber() {
+      this.$state.errorMessage = false;
 
-    getPartie: (state) => {
-      return state.partie;
+      axios.get('/Partie/countAllPartie')
+          .then(response => {
+            if (response.status === 200) {
+              this.$state.errorMessage = false;
+              console.log("response", response)
+
+              this.$state.partieNumber = response.data
+            } else if (response.data.error) {
+
+              // Update the errorMessage property on error
+              this.$state.errorMessage = response.data.error;
+              console.error('Erreur lors de la requête API:', response.data.error);
+            }
+          })
+          .catch(error => {
+            if (error.response && error.response.data.error) {
+              // Update the errorMessage property on error
+              this.$state.errorMessage = error.response.data.error;
+              console.error('Erreur lors de la requête API:', error.response.data.error);
+            } else {
+              console.error('Erreur lors de la requête API', error);
+            }
+          });
     },
-
-    getAllGain: (state) => {
-
-      console.log("test =>", state.allGain)
-      return state.allGain;
-}
 
   }
 

@@ -13,7 +13,7 @@
         <v-row>
           <v-col cols="12" sm="6">
             <v-card class="mb-4">
-              <v-card-title>Total Gagné</v-card-title>
+              <v-card-title>Gain des joueurs</v-card-title>
               <v-card-subtitle class="text-h5 font-weight-bold">
                 {{ totalGagne }}
               </v-card-subtitle>
@@ -22,7 +22,7 @@
 
           <v-col cols="12" sm="6">
             <v-card class="mb-4">
-              <v-card-title>Total Misé</v-card-title>
+              <v-card-title>Mise des joueurs</v-card-title>
               <v-card-subtitle class="text-h5 font-weight-bold">
                 {{ totalMise }}
               </v-card-subtitle>
@@ -31,9 +31,18 @@
 
           <v-col cols="12" sm="6">
             <v-card class="mb-4">
-              <v-card-title>Bénéfice</v-card-title>
+              <v-card-title>Bénéfice du Casino</v-card-title>
               <v-card-subtitle class="text-h5 font-weight-bold">
                 {{ totalMise - totalGagne }}
+              </v-card-subtitle>
+            </v-card>
+          </v-col>
+
+          <v-col cols="12" sm="6">
+            <v-card class="mb-4">
+              <v-card-title>Nombre de partie</v-card-title>
+              <v-card-subtitle class="text-h5 font-weight-bold">
+                {{ partieNumber }}
               </v-card-subtitle>
             </v-card>
           </v-col>
@@ -73,21 +82,25 @@ const totalGagne = ref(0);
 const totalMise = ref(0);
 const labels = ref([]);
 const value = ref([]);
+const partieNumber = ref(0)
 
 // Fonction pour récupérer les données
 const fetchData = async () => {
   try {
     await partieStore.fetchAllGain();
     await partieStore.fetchAllMise();
-    await partieStore.fetchAllParties();
+    await partieStore.fetchGainPerDayList();
+    await partieStore.fetchPartieNumber();
+
+    partieNumber.value = partieStore.partieNumber;
 
     // Mise à jour des totaux
     totalGagne.value = partieStore.allGain;
     totalMise.value = partieStore.allMise;
 
     // Mise à jour des données pour le graphique
-    labels.value = partieStore.parties.map(p => p.date); // Assure-toi que la date est au format souhaité
-    value.value = partieStore.parties.map(p => p.gainDuCasino); // Assure-toi que GainDuCasino est correct
+    labels.value = partieStore.gainPerDayList.map(p => p.date); // Assure-toi que la date est au format souhaité
+    value.value = partieStore.gainPerDayList.map(p => p.gainDuCasino); // Assure-toi que GainDuCasino est correct
   } catch (error) {
     console.error('Erreur lors de la récupération des données :', error);
   }
@@ -114,7 +127,14 @@ watch(
 );
 
 watch(
-    () => partieStore.parties,
+    () => partieStore.partieNumber,
+    (newVal) => {
+      partieNumber.value = newVal;
+    }
+);
+
+watch(
+    () => partieStore.gainPerDayList,
     (newVal) => {
       labels.value = newVal.map(p => p.date);
       value.value = newVal.map(p => p.gainDuCasino);

@@ -283,7 +283,7 @@ export default {
 
 
       } else if (result == 'Draw') {
-        joueur.argent += bet.value;
+        joueur.argent += bet.value*1;
       }
 
       if (partieData.Resultat) {
