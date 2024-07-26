@@ -17,5 +17,6 @@ module.exports = {
             // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vuetify-loader
         }
     },
-    outputDir: 'docs'  // Ajoutez cette ligne pour définir le dossier de sortie
+    outputDir: 'docs',  // Dossier de sortie
+    publicPath: '/blackjack.console/'  // Chemin de base
 };
