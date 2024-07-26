@@ -1,4 +1,4 @@
-// Utilisez module.exports au lieu de defineConfig
+// vue.config.js
 module.exports = {
     transpileDependencies: true,
     chainWebpack: (config) => {
@@ -16,5 +16,6 @@ module.exports = {
         vuetify: {
             // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vuetify-loader
         }
-    }
+    },
+    outputDir: 'docs'  // Ajoutez cette ligne pour définir le dossier de sortie
 };
