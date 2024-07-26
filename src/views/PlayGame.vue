@@ -31,50 +31,53 @@
   <v-container>
     <v-row>
       <v-col>
-        <h1>Jeu de Blackjack </h1>
-        <h2>Argent disponible : {{ money }}</h2>
-        <v-btn v-if="!isGameStarted" @click="openDialog">Commencer un nouveau jeu</v-btn>
-        <v-dialog v-model="dialog">
-          <v-card>
-            <v-card-title>
-              <span class="headline">Entrez votre mise</span>
-            </v-card-title>
-            <v-card-text>
-              <v-text-field v-model="bet" label="Mise" type="number"
-                            :rules="[v => !!v || 'Mise requise']"></v-text-field>
-              <p>Gain potentiel : {{ potentialGain }}</p>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="green darken-1" text @click="startGameWithBet">Commencer le jeu</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-        <!-- Les boutons et informations du jeu de Blackjack -->
-        <div v-if="isGameStarted">
-          <h2>Votre mise : {{ bet }}</h2>
-          <h2>Gain potentiel : {{ potentialGain }}</h2>
-          <!-- Afficher la main du joueur -->
-          <h2>Votre main :</h2>
-          <v-row>
-            <v-col v-for="(card, index) in main" :key="index">
-              <img :src="card.textCarte" :alt="card.valeur">
-            </v-col>
-          </v-row>
-          <v-btn @click="hit" class="mt-5">Hit</v-btn>
-          <v-btn @click="stand" class="mt-5">Stand</v-btn>
-          <div>
-            <p>Total des points : {{ points }}</p>
-          </div>
-          <div v-if="isStand">
-            <h2>Main du croupier :</h2>
+
+        <h1>Argent disponible : {{ money }}</h1>
+        <div>
+          <h2>Jeu de Blackjack </h2>
+          <v-btn v-if="!isGameStarted" @click="openDialog">Jouer</v-btn>
+          <v-dialog v-model="dialog">
+            <v-card>
+              <v-card-title>
+                <span class="headline">Entrez votre mise</span>
+              </v-card-title>
+              <v-card-text>
+                <v-text-field v-model="bet" label="Mise" type="number"
+                              :rules="[v => !!v || 'Mise requise']"></v-text-field>
+                <p>Gain potentiel : {{ potentialGain }}</p>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="green darken-1" text @click="startGameWithBet">Commencer le jeu</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+          <!-- Les boutons et informations du jeu de Blackjack -->
+          <div v-if="isGameStarted">
+            <h2>Votre mise : {{ bet }}</h2>
+            <h2>Gain potentiel : {{ potentialGain }}</h2>
+            <!-- Afficher la main du joueur -->
+            <h2>Votre main :</h2>
             <v-row>
-              <v-col v-for="(card, index) in dealerMains" :key="index">
+              <v-col v-for="(card, index) in main" :key="index">
                 <img :src="card.textCarte" :alt="card.valeur">
               </v-col>
             </v-row>
+            <v-btn @click="hit" class="mt-5">Hit</v-btn>
+            <v-btn @click="stand" class="mt-5">Stand</v-btn>
             <div>
-              <p>Total des points du croupier : {{ dealerPoints }}</p>
+              <p>Total des points : {{ points }}</p>
+            </div>
+            <div v-if="isStand">
+              <h2>Main du croupier :</h2>
+              <v-row>
+                <v-col v-for="(card, index) in dealerMains" :key="index">
+                  <img :src="card.textCarte" :alt="card.valeur">
+                </v-col>
+              </v-row>
+              <div>
+                <p>Total des points du croupier : {{ dealerPoints }}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -106,9 +109,12 @@ export default {
     requiresAuth: true
   },
   setup() {
+    //Récupération des stores
     const userStore = useUsersStore();
     const carteStore = useCarteStore();
     const partieStore = usePartieStore();
+
+    //Initialisation des constante
     const bet = ref(0);
     const dialog = ref(false);
     const isStand = ref(false);
@@ -116,6 +122,7 @@ export default {
     const showLoseDialog = ref(false);
     const showDrawDialog = ref(false);
     let money = ref(null);
+    const paid = ref(false);
     const closeWinDialog = () => {
       showWinDialog.value = false;
       // reset stores after closing win dialog
@@ -159,8 +166,6 @@ export default {
     const dealerPoints = computed(() => {
       let totalPoints = dealerMains.value.reduce((total, card) => total + (card.valeur >= 10 ? 10 : card.valeur), 0);
       const acesCount = dealerMains.value.filter(card => card.valeur === 1).length;
-
-
       if (totalPoints < 21) totalPoints += 10 * acesCount;
       if (totalPoints > 21) totalPoints -= 10 * acesCount;
       return totalPoints;
@@ -177,6 +182,7 @@ export default {
     const notificationMessage = ref('');
 
     const startGameWithBet = () => {
+      paid.value = false;
       if (bet.value <= 0) {
         alert('Entrez une mise valide');
       } else {
@@ -219,36 +225,48 @@ export default {
 
     const announceResult = (dealerPoints) => {
       let result;
-      if (points.value === 21) {
-        result = "win";
-        notificationMessage.value = 'Vous avez eu le Blackjack !';
-        showWinDialog.value = true;
+      switch (true) {
+        case (points.value === 21):
+          result = "win";
+          notificationMessage.value = 'Vous avez eu le Blackjack !';
+          showWinDialog.value = true;
+          break;
+
+        case (dealerPoints > 21):
+          result = "win";
+          notificationMessage.value = 'le croupier a depassé 21 vous gagner';
+          showWinDialog.value = true;
+          break;
+
+        case (dealerPoints < points.value):
+          result = "win";
+          notificationMessage.value = 'le croupier a fait moins de points que vous, vous gagnez';
+          showWinDialog.value = true;
+          break;
+
+        case (points.value > 21):
+          result = "Loose";
+          notificationMessage.value = 'Vous avez dépassé 21 et vous avez perdu.';
+          showLoseDialog.value = true;
+          break;
+
+        case (dealerPoints > points.value && dealerPoints <= 21):
+          result = "Loose";
+          notificationMessage.value = 'Le croupier a une meilleure main que vous, vous perdez';
+          showLoseDialog.value = true;
+          break;
+
+        case (points.value === dealerPoints):
+          result = "Draw";
+          notificationMessage.value = 'Égalité';
+          showDrawDialog.value = true;
+          break;
+
+        default:
+          // Code par défaut si aucune condition n'est remplie
+          break;
       }
-      if (dealerPoints > 21) {
-        result = "win";
-        notificationMessage.value = 'le croupier a depassé 21 vous gagner ';
-        showWinDialog.value = true;
-      }
-      if (dealerPoints < points.value) {
-        result = "win";
-        notificationMessage.value = 'le croupier a a fait moins de point que vous vous gagner';
-        showWinDialog.value = true;
-      }
-      if (points.value > 21) {
-        result = "Loose";
-        notificationMessage.value = 'Vous avez dépassé 21 et vous avez perdu.';
-        showLoseDialog.value = true;
-      }
-      if (dealerPoints > points.value && dealerPoints < 21) {
-        result = "Loose";
-        notificationMessage.value = 'Le croupier a une meilleur main que vous, vous perdez';
-        showLoseDialog.value = true;
-      }
-      if (points.value == dealerPoints) {
-        result = "Draw";
-        notificationMessage.value = 'Egalité';
-        showDrawDialog.value = true;
-      }
+
       const iD_Joueur = userStore.IdUser;
       const partieData = {
         ID_partie: partieStore.partie.iD_partie,
@@ -268,7 +286,8 @@ export default {
       }
 
       if (partieData.Resultat) {
-
+        if (paid.value) return;
+        paid.value = true;
         userStore.UpdateMoney(joueur)
         partieStore.endPartie(partieData)
       }
