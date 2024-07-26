@@ -108,6 +108,7 @@ export default {
   meta: {
     requiresAuth: true
   },
+  viewName: "Jouer",
   setup() {
     //Récupération des stores
     const userStore = useUsersStore();

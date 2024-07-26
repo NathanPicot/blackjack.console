@@ -49,6 +49,8 @@ import {useUsersStore} from '@/store/UserStore';
 import {ref, watch} from 'vue';
 
 export default {
+  viewName: "S'inscrire",
+
   setup() {
     const {addUser, $state} = useUsersStore();
 

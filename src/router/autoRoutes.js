@@ -8,7 +8,8 @@ function importAll(r) {
             path: `/${componentName.toLowerCase()}`,
             name: componentName,
             component: componentConfig.default || componentConfig,
-            meta: componentConfig.default.meta || {}
+            meta: componentConfig.default.meta || {},
+            viewName: componentConfig.default.viewName || componentName,
         });
     });
 }

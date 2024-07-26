@@ -24,6 +24,7 @@ export default {
   meta: {
     requiresAuth: true
   },
+  viewName: "Home"
   // autres options du composant...
 }
 </script>

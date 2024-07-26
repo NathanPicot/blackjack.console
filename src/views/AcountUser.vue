@@ -47,6 +47,7 @@ export default {
   meta: {
     requiresAuth: true
   },
+  viewName: "Compte Utilisateur",
   data: () => ({
     valid: true,
     user: {

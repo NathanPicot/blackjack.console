@@ -40,6 +40,7 @@ import {ref, watch} from 'vue';
 
 
 export default {
+  viewName: "Se connecter",
   setup() {
     const {loginUser, $state} = useUsersStore();
 

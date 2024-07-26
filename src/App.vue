@@ -4,7 +4,7 @@
       <v-list>
         <v-list-item-group>
           <v-list-item v-for="(route, index) in filteredRoutes" :key="index" @click="navigateTo(route.path)">
-            <v-list-item-content>{{ route.name }}</v-list-item-content>
+            <v-list-item-content>{{ route.viewName }}</v-list-item-content>
           </v-list-item>
         </v-list-item-group>
       </v-list>

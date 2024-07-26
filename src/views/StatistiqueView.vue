@@ -127,6 +127,7 @@ watch(
     meta: {
       requiresAuth: true
     },
+    viewName: "Statistique Général"
   }
 </script>
 
